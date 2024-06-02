@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat/model/message.dart';
 import 'package:flutter_chat/model/user.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:intl/intl.dart';
 
 class Chat extends StatefulWidget {
   final String userName;
@@ -62,6 +63,13 @@ class _ChatState extends State<Chat> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    socket.disconnected;
+    socket.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -71,47 +79,71 @@ class _ChatState extends State<Chat> {
         children: <Widget>[
           Expanded(
             child: ListView.builder(
+              shrinkWrap: true,
               itemCount: messages.length,
               itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 8.0),
-                  child: Container(
-                    color: messages[index].name == widget.userName
-                        ? Colors.green[100]
-                        : Colors.blue[100],
-                    child: Column(
+                return Container(
+                  padding: const EdgeInsets.only(
+                      left: 14, right: 14, top: 4, bottom: 4),
+                  child: Align(
+                    alignment: messages[index].name == widget.userName
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        SizedBox(
-                            height: 20,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    messages[index].name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    messages[index].time,
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
+                        if (messages[index].name == widget.userName)
+                          Text(
+                            DateFormat('hh:mm a')
+                                // DateFormat('yy/MM/dd - hh:mm a')
+                                .format(DateTime.parse(messages[index].time)),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: (messages[index].name == widget.userName
+                                ? Colors.grey.shade200
+                                : Colors.blue[200]),
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: MediaQuery.of(context).size.width * 0.4,
+                          ),
+                          padding: EdgeInsets.all(16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                messages[index].name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            )),
-                        const SizedBox(
-                          height: 2,
+                              const SizedBox(
+                                height: 2,
+                              ),
+                              Text(
+                                messages[index].text,
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        ListTile(
-                          title: Text(messages[index].text),
-                        ),
+                        if (messages[index].name != widget.userName)
+                          Text(
+                            DateFormat('hh:mm a')
+                                // DateFormat('yy/MM/dd - hh:mm a')
+                                .format(DateTime.parse(messages[index].time)),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
                       ],
                     ),
                   ),
