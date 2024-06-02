@@ -16,7 +16,7 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  late final IO.Socket socket;
+  IO.Socket? socket;
   TextEditingController _controller = TextEditingController();
   List<Message> messages = [];
   List<User> users = [];
@@ -24,32 +24,35 @@ class _ChatState extends State<Chat> {
   @override
   void initState() {
     super.initState();
+    log('om');
     connectToServer();
   }
 
   void connectToServer() {
     socket = IO.io('http://10.0.2.2:3000', <String, dynamic>{
       'transports': ['websocket'],
+      'force new connection': true,
     });
-    socket.on('connect', (_) {
+    socket?.on('connect', (_) {
       print('Connected to server');
-      socket.emit('joinRoom', {
+      socket?.emit('joinRoom', {
         'username': widget.userName,
         'room': widget.roomName,
       });
     });
 
-    socket.on('disconnect', (_) {
+    socket?.on('disconnect', (_) {
       print('Disconnected from server');
     });
-    socket.on("roomUsers", (data) {
+
+    socket?.on("roomUsers", (data) {
       log('data $data');
       if (data['users'] != null) {
         users = List<User>.from(data['users'].map((x) => User.fromJson(x)));
       }
     });
 
-    socket.on('message', (msg) {
+    socket?.on('message', (msg) {
       log('message ${msg}');
       setState(() {
         messages.add(Message.fromJson(msg));
@@ -58,15 +61,16 @@ class _ChatState extends State<Chat> {
   }
 
   void sendMessage(String message) {
-    socket.emit('chatMessage', message);
+    socket?.emit('chatMessage', message);
     _controller.clear();
   }
 
   @override
   void dispose() {
     super.dispose();
-    socket.disconnected;
-    socket.dispose();
+    socket?.disconnect();
+    socket?.dispose();
+    socket = null;
   }
 
   @override
