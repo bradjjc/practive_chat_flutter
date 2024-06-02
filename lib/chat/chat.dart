@@ -162,9 +162,14 @@ class _ChatState extends State<Chat> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Enter your message',
                     ),
+                    onSubmitted: (value) {
+                      if (_controller.text.isNotEmpty) {
+                        sendMessage(_controller.text);
+                      }
+                    },
                   ),
                 ),
                 IconButton(
