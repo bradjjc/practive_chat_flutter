@@ -24,20 +24,25 @@ class _LoginState extends State<Login> {
       appBar: AppBar(
         title: Text('방 접속 하기'),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            TextField(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: TextField(
               controller: _controllerName,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: '사용하실 닉네임을 입력하세요',
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
-            DropdownButton(
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: DropdownButton(
               items: roomName
                   .map((e) => DropdownMenuItem(child: Text(e), value: e))
                   .toList(),
@@ -50,25 +55,25 @@ class _LoginState extends State<Login> {
                 }
               },
             ),
-            SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Chat(
-                      userName: _controllerName.text,
-                      roomName: selectedRoom,
-                    ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Chat(
+                    userName: _controllerName.text,
+                    roomName: selectedRoom,
                   ),
-                );
-              },
-              child: Text('입장하기'),
-            ),
-          ],
-        ),
+                ),
+              );
+            },
+            child: Text('입장하기'),
+          ),
+        ],
       ),
     );
   }
